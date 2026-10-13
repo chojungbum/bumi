@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>결제 실패 | 광수호텔 해운대</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bk-page" data-keep-title="1">
+<main class="wrap">
+  <div class="result bad">
+    <div class="icon">!</div>
+    <h1 data-i18n="ng.title"></h1>
+    <p data-i18n="ng.desc"></p>
+    <p id="detail" style="margin-top:10px;font-size:13px"></p>
+    <p style="margin-top:24px"><a class="btn btn-navy" href="/booking/" data-i18n="ng.retry"></a></p>
+  </div>
+</main>
+<script type="module">
+import { boot } from '/js/common.js';
+boot({ solid: true });
+const q = new URLSearchParams(location.search);
+const m = q.get('message'), c = q.get('code');
+if (m) document.getElementById('detail').textContent = `${m}${c ? ' (' + c + ')' : ''}`;
+</script>
+<div style="position:fixed;left:0;right:0;bottom:0;z-index:90;background:#0a1d2a;color:#fff;font:13px/1.4 sans-serif;padding:9px 16px;text-align:center"><b style="color:#c9a86a">테스트 사이트</b> · 오픈 전 검토용입니다. 요금은 임시값이며 결제는 토스페이먼츠 테스트 모드(실제 청구 없음)입니다.</div>
+</body>
+</html>

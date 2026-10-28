@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>결제 실패 | 광수호텔 해운대</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bk-page" data-keep-title="1">
+<main class="wrap">
+  <div class="result bad">
+    <div class="icon">!</div>
+    <h1 data-i18n="ng.title"></h1>
+    <p data-i18n="ng.desc"></p>
+    <p id="detail" style="margin-top:10px;font-size:13px"></p>
+    <p style="margin-top:24px"><a class="btn btn-navy" href="/booking/" data-i18n="ng.retry"></a></p>
+  </div>
+</main>
+<script type="module">
+import { boot } from '/js/common.js';
+boot({ solid: true });
+const q = new URLSearchParams(location.search);
+const m = q.get('message'), c = q.get('code');
+if (m) document.getElementById('detail').textContent = `${m}${c ? ' (' + c + ')' : ''}`;
+</script>
+</body>
+</html>

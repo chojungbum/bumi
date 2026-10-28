@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>객실 예약 | 광수호텔 해운대</title>
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+<script src="https://js.tosspayments.com/v2/standard"></script>
+</head>
+<body class="bk-page" data-keep-title="1">
+<main class="wrap">
+  <div class="bk-head">
+    <h1 data-i18n="bk.title"></h1>
+    <span class="testbadge hide" id="testbadge" data-i18n="bk.test"></span>
+    <ol class="steps" id="steps">
+      <li data-s="1" data-i18n="bk.s1"></li><li data-s="2" data-i18n="bk.s2"></li>
+      <li data-s="3" data-i18n="bk.s3"></li><li data-s="4" data-i18n="bk.s4"></li>
+    </ol>
+  </div>
+
+  <div class="bk-grid">
+    <div>
+      <!-- STEP 1 · 2 -->
+      <div class="card" id="c-dates">
+        <h2 data-i18n="bk.s1"></h2>
+        <div class="fields">
+          <label class="field"><span data-i18n="bar.checkin"></span><input type="date" id="f-in"></label>
+          <label class="field"><span data-i18n="bar.checkout"></span><input type="date" id="f-out"></label>
+          <label class="field"><span data-i18n="bar.adults"></span><select id="f-a"><option>1</option><option selected>2</option><option>3</option></select></label>
+          <label class="field"><span data-i18n="bar.children"></span><select id="f-c"><option selected>0</option><option>1</option><option>2</option></select></label>
+        </div>
+        <p class="info-line hide" id="open-note"></p>
+        <p class="err" id="e-dates"></p>
+      </div>
+
+      <div class="card" id="c-rooms">
+        <h2 data-i18n="bk.s2"></h2>
+        <div class="rlist" id="rlist"></div>
+        <div class="actions" style="justify-content:flex-end">
+          <button class="btn btn-navy" id="to-guest" disabled data-i18n="bk.s3"></button>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="card hide" id="c-guest">
+        <h2 data-i18n="bk.s3"></h2>
+        <div class="fields">
+          <label class="field half"><span data-i18n="bk.name"></span><input id="g-name" maxlength="50" autocomplete="name" data-i18n-ph="bk.namePh"></label>
+          <label class="field half"><span data-i18n="bk.phone"></span><input id="g-phone" inputmode="tel" maxlength="20" autocomplete="tel" data-i18n-ph="bk.phonePh"></label>
+          <label class="field full"><span data-i18n="bk.email"></span><input id="g-email" type="email" maxlength="100" autocomplete="email"></label>
+          <label class="field full"><span data-i18n="bk.request"></span><textarea id="g-req" rows="3" maxlength="500"></textarea></label>
+        </div>
+        <label class="check"><input type="checkbox" id="g-bf"><span><b data-i18n="bk.breakfast"></b> · <span data-i18n="bk.breakfastNote"></span></span></label>
+        <label class="check"><input type="checkbox" id="g-agree"><span data-i18n="bk.agree"></span></label>
+        <p class="err" id="e-guest"></p>
+        <div class="actions">
+          <button class="btn btn-ghost" id="back-1" data-i18n="bk.back"></button>
+          <button class="btn btn-navy" id="to-pay" data-i18n="bk.toPay"></button>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="card hide" id="c-pay">
+        <h2 data-i18n="bk.s4"></h2>
+        <div id="payment-method"></div>
+        <div id="agreement"></div>
+        <p class="err" id="e-pay"></p>
+        <div class="actions">
+          <button class="btn btn-ghost" id="back-2" data-i18n="bk.back"></button>
+          <button class="btn btn-sand" id="pay" disabled></button>
+        </div>
+      </div>
+    </div>
+
+    <aside class="card sum" id="sum">
+      <h2 data-i18n="bk.sum"></h2>
+      <dl>
+        <dt data-i18n="bk.room"></dt><dd id="s-room">—</dd>
+        <dt data-i18n="bk.dates"></dt><dd id="s-dates">—</dd>
+        <dt data-i18n="bk.guests"></dt><dd id="s-guests">—</dd>
+        <dt data-i18n="bk.roomTotal"></dt><dd id="s-rt">—</dd>
+        <dt data-i18n="bk.bfTotal"></dt><dd id="s-bf">—</dd>
+      </dl>
+      <div class="lines" id="s-lines"></div>
+      <div class="tot"><span data-i18n="bk.total"></span><b id="s-total">—</b></div>
+    </aside>
+  </div>
+</main>
+<script type="module" src="/js/booking.js"></script>
+</body>
+</html>

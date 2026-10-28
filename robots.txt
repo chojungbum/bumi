@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /booking/success.html
+Disallow: /booking/fail.html
+Sitemap: https://kwangsuhotel.com/sitemap.xml

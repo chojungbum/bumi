@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>예약 완료 | 광수호텔 해운대</title><meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bk-page" data-keep-title="1">
+<main class="wrap">
+  <div class="result" id="wait"><div class="spin"></div><p data-i18n="ok.confirming"></p></div>
+  <div class="result hide" id="ok">
+    <div class="icon">✓</div>
+    <h1 data-i18n="ok.title"></h1>
+    <p data-i18n="ok.desc"></p>
+    <div class="card sum" style="position:static;margin:28px 0;text-align:left">
+      <dl>
+        <dt data-i18n="ok.no"></dt><dd id="r-no"></dd>
+        <dt data-i18n="bk.room"></dt><dd id="r-room"></dd>
+        <dt data-i18n="bk.dates"></dt><dd id="r-dates"></dd>
+        <dt data-i18n="bk.guests"></dt><dd id="r-guests"></dd>
+      </dl>
+      <div class="tot"><span data-i18n="ok.paid"></span><b id="r-amt"></b></div>
+    </div>
+    <a class="btn btn-ghost hide" id="r-receipt" target="_blank" rel="noopener" data-i18n="ok.receipt"></a>
+    <a class="btn btn-navy" href="/" data-i18n="ok.home"></a>
+  </div>
+  <div class="result bad hide" id="ng">
+    <div class="icon">!</div>
+    <h1 data-i18n="ng.title"></h1>
+    <p id="ng-msg" data-i18n="ng.desc"></p>
+    <p style="margin-top:24px"><a class="btn btn-navy" href="/booking/" data-i18n="ng.retry"></a></p>
+  </div>
+</main>
+<script type="module">
+import { boot } from '/js/common.js';
+import { ROOMS } from '/js/pricing.js';
+import { t, lang, won, fmtDay } from '/js/i18n.js';
+const $ = (id) => document.getElementById(id);
+let order = null;
+const paint = () => {
+  if (!order) return;
+  const r = ROOMS.find((x) => x.id === order.quote.roomId);
+  $('r-no').textContent = order.orderId;
+  $('r-room').textContent = r ? r.name[lang()] : order.quote.roomId;
+  $('r-dates').innerHTML = `${fmtDay(order.quote.checkIn)}<br>→ ${fmtDay(order.quote.checkOut)}`;
+  $('r-guests').textContent = t('bk.adultsN', { a: order.quote.adults }) + (order.quote.children ? ' · ' + t('bk.childrenN', { c: order.quote.children }) : '');
+  $('r-amt').textContent = won(order.quote.total);
+  if (order.receiptUrl) { $('r-receipt').href = order.receiptUrl; $('r-receipt').classList.remove('hide'); }
+};
+boot({ solid: true, render: paint });
+const q = new URLSearchParams(location.search);
+try {
+  const res = await fetch('/api/confirm', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ paymentKey: q.get('paymentKey'), orderId: q.get('orderId'), amount: Number(q.get('amount')) }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok || !data.ok) throw new Error(data.message || data.error || 'ERROR');
+  order = data.order; paint();
+  $('wait').classList.add('hide'); $('ok').classList.remove('hide');
+} catch (e) {
+  $('wait').classList.add('hide'); $('ng').classList.remove('hide');
+  if (e.message && e.message !== 'ERROR') $('ng-msg').textContent = e.message;
+}
+</script>
+</body>
+</html>

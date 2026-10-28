@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>예약 관리 | 광수호텔</title><meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="/css/style.css">
+<style>
+body{background:#f3f1ec}.adm{max-width:1200px;margin:0 auto;padding:32px 16px}
+.adm h1{color:var(--navy);font-size:24px;margin-bottom:16px}
+.bar2{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center}
+.bar2 input{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font:inherit;min-width:260px}
+.tbl{width:100%;border-collapse:collapse;background:#fff;font-size:13px;border-radius:12px;overflow:hidden}
+.tbl th,.tbl td{padding:10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.tbl th{background:var(--navy);color:#fff;font-weight:500;white-space:nowrap}
+.st{padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600}
+.st.PAID{background:#e3f4ea;color:var(--ok)}.st.PENDING{background:#fff4d6;color:#8a5a00}.st.FAILED{background:#fde7e5;color:var(--danger)}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="adm">
+  <h1>예약 관리</h1>
+  <div class="bar2">
+    <input type="password" id="tk" placeholder="관리자 토큰 (ADMIN_TOKEN)">
+    <label class="check" style="margin:0"><input type="checkbox" id="all"> 미결제·실패 건 포함</label>
+    <button class="btn btn-navy" id="go">조회</button>
+    <button class="btn btn-ghost" id="csv">CSV 저장</button>
+    <span id="msg" style="color:var(--muted);font-size:14px"></span>
+  </div>
+  <div class="scroll"><table class="tbl"><thead><tr>
+    <th>상태</th><th>예약번호</th><th>객실</th><th>체크인</th><th>체크아웃</th><th>박</th><th>인원</th><th>조식</th><th>금액</th><th>예약자</th><th>연락처</th><th>이메일</th><th>요청사항</th><th>결제수단</th><th>결제시각</th>
+  </tr></thead><tbody id="rows"></tbody></table></div>
+</div>
+<script type="module">
+import { ROOMS } from '/js/pricing.js';
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+let data = [];
+const rn = (id) => (ROOMS.find((r) => r.id === id) || { name: { ko: id } }).name.ko;
+const row = (o) => [o.status, o.orderId, rn(o.quote.roomId), o.quote.checkIn, o.quote.checkOut, o.quote.nights,
+  `성인${o.quote.adults}${o.quote.children ? ' 아동' + o.quote.children : ''}`, o.quote.breakfast ? 'Y' : '', o.quote.total,
+  o.guest.name, o.guest.phone, o.guest.email, o.guest.request, o.payment?.method || '', o.payment?.approvedAt || ''];
+$('go').onclick = async () => {
+  $('msg').textContent = '조회 중…';
+  const r = await fetch('/api/admin/reservations' + ($('all').checked ? '?all=1' : ''), { headers: { Authorization: 'Bearer ' + $('tk').value } });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { $('msg').textContent = '오류: ' + (j.error || r.status); return; }
+  data = j.reservations; $('msg').textContent = `${j.count}건`;
+  $('rows').innerHTML = data.map((o) => '<tr>' + row(o).map((v, i) => i === 0 ? `<td><span class="st ${v}">${v}</span></td>` : i === 8 ? `<td>₩${Number(v).toLocaleString()}</td>` : `<td>${esc(v)}</td>`).join('') + '</tr>').join('');
+};
+$('csv').onclick = () => {
+  const head = ['상태','예약번호','객실','체크인','체크아웃','박','인원','조식','금액','예약자','연락처','이메일','요청사항','결제수단','결제시각'];
+  const csv = [head, ...data.map(row)].map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv' }));
+  a.download = `reservations_${new Date().toISOString().slice(0, 10)}.csv`; a.click();
+};
+</script>
+</body>
+</html>
